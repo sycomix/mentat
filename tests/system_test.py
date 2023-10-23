@@ -141,7 +141,7 @@ async def test_without_os_join(
     )
 
     # Use / here since that should always be what the model outputs
-    fake_file_path = temp_dir + "/" + temp_file_name
+    fake_file_path = f"{temp_dir}/{temp_file_name}"
     mock_call_llm_api.set_generator_values([dedent("""\
         I will add a print statement.
         Steps:

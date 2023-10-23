@@ -15,9 +15,7 @@ def get_git_diff_for_path(path: Path) -> str:
 
 
 def get_non_gitignored_files(path: Path) -> set[Path]:
-    return set(
-        # git returns / separated paths even on windows, convert so we can remove
-        # glob_excluded_files, which have windows paths on windows
+    return {
         Path(os.path.normpath(p))
         for p in filter(
             lambda p: p != "",
@@ -28,7 +26,7 @@ def get_non_gitignored_files(path: Path) -> set[Path]:
                 text=True,
             ).split("\n"),
         )
-    )
+    }
 
 
 def get_paths_with_git_diffs() -> set[Path]:
@@ -49,10 +47,7 @@ def get_paths_with_git_diffs() -> set[Path]:
 
 
 def _get_git_root_for_path(path: Path) -> Path:
-    if os.path.isdir(path):
-        dir_path = path
-    else:
-        dir_path = os.path.dirname(path)
+    dir_path = path if os.path.isdir(path) else os.path.dirname(path)
     try:
         relative_path = (
             subprocess.check_output(
@@ -114,10 +109,11 @@ def get_diff_for_file(target: str, path: Path) -> str:
     git_root = GIT_ROOT.get()
 
     try:
-        diff_content = subprocess.check_output(
-            ["git", "diff", "-U0", f"{target}", "--", path], cwd=git_root, text=True
+        return subprocess.check_output(
+            ["git", "diff", "-U0", f"{target}", "--", path],
+            cwd=git_root,
+            text=True,
         ).strip()
-        return diff_content
     except subprocess.CalledProcessError:
         logging.error(f"Error obtaining diff for commit '{target}'.")
         raise UserError()
@@ -146,10 +142,11 @@ def get_files_in_diff(target: str) -> list[Path]:
     git_root = GIT_ROOT.get()
 
     try:
-        diff_content = subprocess.check_output(
-            ["git", "diff", "--name-only", f"{target}", "--"], cwd=git_root, text=True
-        ).strip()
-        if diff_content:
+        if diff_content := subprocess.check_output(
+            ["git", "diff", "--name-only", f"{target}", "--"],
+            cwd=git_root,
+            text=True,
+        ).strip():
             return [Path(path) for path in diff_content.split("\n")]
         else:
             return []
@@ -172,11 +169,11 @@ def get_default_branch() -> str:
     git_root = GIT_ROOT.get()
 
     try:
-        # Fetch the symbolic ref of HEAD which points to the default branch
-        default_branch = subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=git_root, text=True
+        return subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=git_root,
+            text=True,
         ).strip()
-        return default_branch
     except subprocess.CalledProcessError:
         # Handle error if needed or raise an exception
         raise Exception("Unable to determine the default branch.")

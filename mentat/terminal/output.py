@@ -19,7 +19,7 @@ def _print_stream_message_string(
     if color is not None:
         f_color = color.replace("_", "").replace("light", "bright")
         if f_color != "" and not f_color.startswith("ansi"):
-            f_color = "ansi" + f_color
+            f_color = f"ansi{f_color}"
         print_formatted_text(FormattedText([(f_color, content)]), end=end, flush=flush)
     else:
         print(content, end=end, flush=True)

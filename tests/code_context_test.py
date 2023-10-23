@@ -129,7 +129,7 @@ async def test_cli_glob_exclude(temp_testbed, mock_git_root, mock_stream, mock_c
         file_paths, exclude_paths, code_context_settings
     )
 
-    file_paths = [file_path for file_path in code_context.include_files]
+    file_paths = list(code_context.include_files)
     assert os.path.join(temp_testbed, glob_include_then_exclude_path) not in file_paths
     assert os.path.join(temp_testbed, glob_exclude_path) not in file_paths
 
@@ -146,7 +146,7 @@ async def test_text_encoding_checking(
 
     code_context_settings = CodeContextSettings()
     code_context = await CodeContext.create(["./"], [], code_context_settings)
-    file_paths = [file_path for file_path in code_context.include_files]
+    file_paths = list(code_context.include_files)
     assert os.path.join(temp_testbed, nontext_path) not in file_paths
 
     nontext_path_requested = "iamalsonottext.py"

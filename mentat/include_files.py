@@ -15,16 +15,12 @@ def expand_paths(paths: list[Path]) -> list[Path]:
     globbed_paths = set[str]()
     invalid_paths = set[str]()
     for path in paths:
-        new_paths = glob.glob(pathname=str(path), recursive=True)
-        if new_paths:
+        if new_paths := glob.glob(pathname=str(path), recursive=True):
             globbed_paths.update(new_paths)
         else:
             split = str(path).rsplit(":", 1)
             p = Path(split[0])
-            if len(split) > 1:
-                intervals = parse_intervals(split[1])
-            else:
-                intervals = None
+            intervals = parse_intervals(split[1]) if len(split) > 1 else None
             if Path(p).exists() and intervals:
                 globbed_paths.add(str(path))
             else:
@@ -72,7 +68,7 @@ def abs_files_from_list(paths: list[Path], check_for_text: bool = True):
                 )
             )
 
-    files_from_dirs = set(CodeFile(path.resolve()) for path in file_paths_from_dirs)
+    files_from_dirs = {CodeFile(path.resolve()) for path in file_paths_from_dirs}
     return files_direct, files_from_dirs, invalid_paths
 
 
@@ -93,16 +89,15 @@ def get_include_files(
         map(lambda f: f.path, excluded_files_direct | excluded_files_from_dirs)
     )
 
-    glob_excluded_files = set(
+    glob_excluded_files = {
         Path(os.path.join(git_root, file))
         for glob_path in config.file_exclude_glob_list()
-        # If the user puts a / at the beginning, it will try to look in root directory
         for file in glob.glob(
             pathname=glob_path,
             root_dir=git_root,
             recursive=True,
         )
-    )
+    }
     files_direct, files_from_dirs, invalid_paths = abs_files_from_list(
         paths, check_for_text=True
     )
@@ -145,10 +140,10 @@ async def print_path_tree(
     keys = list(tree.keys())
     for i, key in enumerate(sorted(keys)):
         if i < len(keys) - 1:
-            new_prefix = prefix + "│   "
+            new_prefix = f"{prefix}│   "
             await stream.send(f"{prefix}├── ", end="")
         else:
-            new_prefix = prefix + "    "
+            new_prefix = f"{prefix}    "
             await stream.send(f"{prefix}└── ", end="")
 
         cur = cur_path / key

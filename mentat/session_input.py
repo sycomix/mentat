@@ -72,9 +72,8 @@ async def listen_for_interrupt(
 
         if wrapped_task in done:
             return wrapped_task.result()
-        else:
-            # Send a newline for terminal clients (remove later)
-            await stream.send("\n")
+        # Send a newline for terminal clients (remove later)
+        await stream.send("\n")
 
-            if raise_exception_on_interrupt:
-                raise RemoteKeyboardInterrupt
+        if raise_exception_on_interrupt:
+            raise RemoteKeyboardInterrupt

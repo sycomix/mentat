@@ -36,14 +36,13 @@ class FileActionType(Enum):
 
 def get_file_action_type(is_creation: bool, is_deletion: bool, new_name: Path | None):
     if is_creation:
-        file_action_type = FileActionType.CreateFile
+        return FileActionType.CreateFile
     elif is_deletion:
-        file_action_type = FileActionType.DeleteFile
+        return FileActionType.DeleteFile
     elif new_name is not None:
-        file_action_type = FileActionType.RenameFile
+        return FileActionType.RenameFile
     else:
-        file_action_type = FileActionType.UpdateFile
-    return file_action_type
+        return FileActionType.UpdateFile
 
 
 @attr.define(slots=False)
@@ -77,11 +76,7 @@ def _remove_extra_empty_lines(lines: list[str]) -> list[str]:
         end -= 1
 
     # If all lines are empty, keep only one empty line
-    if start == len(lines):
-        return [" "]
-
-    # Return the list with only a maximum of one empty line on either side
-    return lines[max(start - 1, 0) : end + 2]
+    return [" "] if start == len(lines) else lines[max(start - 1, 0) : end + 2]
 
 
 def _prefixed_lines(line_number_buffer: int, lines: list[str], prefix: str):
@@ -99,8 +94,7 @@ def _get_code_block(
     prefix: str,
     color: str | None,
 ):
-    lines = _prefixed_lines(line_number_buffer, code_lines, prefix)
-    if lines:
+    if lines := _prefixed_lines(line_number_buffer, code_lines, prefix):
         return colored(lines, color=color)
     else:
         return ""
@@ -124,8 +118,7 @@ def get_full_change(display_information: DisplayInformation):
             else ""
         ),
     ]
-    full_change = "\n".join([line for line in to_print if line])
-    return full_change
+    return "\n".join([line for line in to_print if line])
 
 
 def get_file_name(
@@ -198,10 +191,12 @@ def get_previous_lines(
         ]
     )
     numbered = [
-        (str(display_information.first_changed_line - len(lines) + i + 1) + ":").ljust(
-            display_information.line_number_buffer
+        (
+            f"{str(display_information.first_changed_line - len(lines) + i + 1)}:".ljust(
+                display_information.line_number_buffer
+            )
+            + line
         )
-        + line
         for i, line in enumerate(lines)
     ]
 
@@ -228,10 +223,12 @@ def get_later_lines(
         ]
     )
     numbered = [
-        (str(display_information.last_changed_line + 1 + i) + ":").ljust(
-            display_information.line_number_buffer
+        (
+            f"{str(display_information.last_changed_line + 1 + i)}:".ljust(
+                display_information.line_number_buffer
+            )
+            + line
         )
-        + line
         for i, line in enumerate(lines)
     ]
 

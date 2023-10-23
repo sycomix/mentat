@@ -83,17 +83,16 @@ class CodeFileManager:
                     )
                 self.history.add_action(CreationAction(file_edit.file_path))
                 self._create_file(code_context, file_edit.file_path)
-            else:
-                if not file_edit.file_path.exists():
-                    raise MentatError(
-                        f"Attempted to edit non-existent file {file_edit.file_path}"
-                    )
-                elif file_edit.file_path not in code_context.include_files:
-                    await stream.send(
-                        f"Attempted to edit file {file_edit.file_path} not in context",
-                        color="yellow",
-                    )
-                    continue
+            elif not file_edit.file_path.exists():
+                raise MentatError(
+                    f"Attempted to edit non-existent file {file_edit.file_path}"
+                )
+            elif file_edit.file_path not in code_context.include_files:
+                await stream.send(
+                    f"Attempted to edit file {file_edit.file_path} not in context",
+                    color="yellow",
+                )
+                continue
 
             if file_edit.is_deletion:
                 await stream.send(
@@ -154,6 +153,4 @@ class CodeFileManager:
         self.history.push_edits()
 
     def get_file_checksum(self, path: Path) -> str:
-        if path.is_dir():
-            return ""  # TODO: Build and maintain a hash tree for git_root
-        return sha256(path.read_text())
+        return "" if path.is_dir() else sha256(path.read_text())

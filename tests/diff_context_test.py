@@ -49,8 +49,7 @@ def _get_file_message(temp_testbed):
     abs_path = os.path.join(temp_testbed, "multifile_calculator", "operations.py")
     file_message = ["/multifile_calculator/operations.py"]
     with open(abs_path, "r") as f:
-        for i, line in enumerate(f.readlines()):
-            file_message.append(f"{i}:{line}")
+        file_message.extend(f"{i}:{line}" for i, line in enumerate(f.readlines()))
     return file_message
 
 

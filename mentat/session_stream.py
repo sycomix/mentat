@@ -73,8 +73,7 @@ class SessionStream:
         """Listen for a single event on a channel"""
         async with self._broadcast.subscribe(channel) as subscriber:
             async for event in subscriber:
-                stream_message = cast(StreamMessage, event.message)
-                return stream_message
+                return cast(StreamMessage, event.message)
             raise Exception("recv should not complete without receiving an Event")
 
     async def listen(

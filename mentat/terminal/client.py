@@ -171,7 +171,7 @@ class TerminalClient:
         for task in self._tasks:
             task.cancel()
         while not self._force_exit:
-            if all([task.cancelled() for task in self._tasks]):
+            if all(task.cancelled() for task in self._tasks):
                 break
             await asyncio.sleep(0.01)
 

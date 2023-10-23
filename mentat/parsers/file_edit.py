@@ -77,17 +77,16 @@ class FileEdit:
                     f"File {rel_path} already exists, canceling creation."
                 )
                 return False
-        else:
-            if not self.file_path.exists():
-                await stream.send(
-                    f"File {rel_path} does not exist, canceling all edits to file."
-                )
-                return False
-            elif rel_path not in code_file_manager.file_lines:
-                await stream.send(
-                    f"File {rel_path} not in context, canceling all edits to file."
-                )
-                return False
+        elif not self.file_path.exists():
+            await stream.send(
+                f"File {rel_path} does not exist, canceling all edits to file."
+            )
+            return False
+        elif rel_path not in code_file_manager.file_lines:
+            await stream.send(
+                f"File {rel_path} not in context, canceling all edits to file."
+            )
+            return False
 
         if self.rename_file_path is not None and self.rename_file_path.exists():
             rel_rename_path = Path(os.path.relpath(self.rename_file_path, git_root))
@@ -169,7 +168,7 @@ class FileEdit:
         await stream.send(self.file_path)
         await stream.send(change_delimiter)
         for line in first.new_lines + second.new_lines:
-            await stream.send("+ " + line, color="green")
+            await stream.send(f"+ {line}", color="green")
         await stream.send("")
 
     async def resolve_conflicts(self):

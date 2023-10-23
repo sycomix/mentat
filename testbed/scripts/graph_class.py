@@ -19,8 +19,7 @@ class Graph:
             cur_node = to_visit.pop()
             if self.values[cur_node] == goal:
                 return cur_node
-            for adj in self.connections[cur_node]:
-                to_visit.append(adj)
+            to_visit.extend(iter(self.connections[cur_node]))
         return -1
 
 

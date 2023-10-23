@@ -136,8 +136,7 @@ class MentatCompleter(Completer):
 
         for completion in completions:
             if completion.lower().startswith(last_word.lower()):
-                file_names = self.file_name_completions.get(completion)
-                if file_names:
+                if file_names := self.file_name_completions.get(completion):
                     for file_name in file_names:
                         yield Completion(
                             get_completion_insert(str(file_name)),

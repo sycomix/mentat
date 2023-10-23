@@ -95,10 +95,7 @@ class UnifiedDiffParser(Parser):
         is_deletion = new_name == "/dev/null"
         if is_creation:
             file_name = new_name
-        if file_name == new_name or is_deletion:
-            new_name = None
-        else:
-            new_name = Path(new_name)
+        new_name = None if file_name == new_name or is_deletion else Path(new_name)
         file_name = Path(file_name)
         file_lines = self._get_file_lines(code_file_manager, rename_map, file_name)
         file_action_type = get_file_action_type(is_creation, is_deletion, new_name)
@@ -134,10 +131,10 @@ class UnifiedDiffParser(Parser):
         changes = list[list[str]]()
         cur_lines = list[str]()
         for line in lines:
-            if (
-                line.strip() == UnifiedDiffDelimiter.MidChange.value.strip()
-                or line.strip() == UnifiedDiffDelimiter.EndChange.value.strip()
-            ):
+            if line.strip() in [
+                UnifiedDiffDelimiter.MidChange.value.strip(),
+                UnifiedDiffDelimiter.EndChange.value.strip(),
+            ]:
                 changes.append(cur_lines)
                 cur_lines = list[str]()
                 if line.strip() == UnifiedDiffDelimiter.EndChange.value.strip():

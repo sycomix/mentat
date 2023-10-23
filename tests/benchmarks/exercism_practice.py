@@ -28,9 +28,7 @@ def clone_exercism_repo(refresh_repo, language):
 @pytest.fixture
 def exercises(request):
     exercises = request.config.getoption("--exercises")
-    if len(exercises) == 1:
-        return exercises[0]
-    return exercises
+    return exercises[0] if len(exercises) == 1 else exercises
 
 
 @pytest.fixture
@@ -117,8 +115,7 @@ async def failure_analysis(exercise_runner, language):
 
 async def run_exercise(problem_dir, language="python", max_iterations=2):
     exercise_runner = ExerciseRunnerFactory.create(language, problem_dir)
-    old_result = exercise_runner.get_result_from_txt()
-    if old_result:
+    if old_result := exercise_runner.get_result_from_txt():
         return old_result
     client = PythonClient(
         paths=exercise_runner.include_files(),
@@ -172,7 +169,7 @@ def run_exercise_sync(problem_dir, language="python", max_iterations=2):
         result = asyncio.run(run_exercise(problem_dir, language, max_iterations))
     except Exception as e:
         print(f"\nError running {problem_dir}")
-        print(str(e), flush=True)
+        print(e, flush=True)
         result = {
             "iterations": 0,
             "passed": False,
@@ -192,12 +189,11 @@ def summarize_results(results):
     failed = 0
     for result in results:
         if result["passed"]:
-            iteration = result["iterations"]
-            if iteration:
+            if iteration := result["iterations"]:
                 passed_in_n[iteration] = passed_in_n.get(iteration, 0) + 1
         else:
             failed += 1
-    return "Passed: " + str(passed_in_n)[1:-1] + "| Failed: " + str(failed)
+    return f"Passed: {str(passed_in_n)[1:-1]}| Failed: {str(failed)}"
 
 
 def test_practice_directory_performance(
@@ -234,7 +230,7 @@ def test_practice_directory_performance(
                 json.dump(result, f)
                 f.write("\n")
             pbar.set_description(
-                summarize_results(results) + "| Last Ran: " + result["test"]
+                f"{summarize_results(results)}| Last Ran: " + result["test"]
             )
         results.sort(key=lambda result: result["test"])
 

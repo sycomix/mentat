@@ -17,7 +17,7 @@ class StreamingPrinter:
         if self.finishing:
             return
 
-        if len(string) == 0:
+        if not string:
             return
         string += end
 

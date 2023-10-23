@@ -85,10 +85,10 @@ class BlockParser(Parser):
 
     @override
     def _ends_special(self, line: str) -> bool:
-        return (
-            line == _BlockParserIndicator.Code.value
-            or line == _BlockParserIndicator.End.value
-        )
+        return line in [
+            _BlockParserIndicator.Code.value,
+            _BlockParserIndicator.End.value,
+        ]
 
     @override
     def _special_block(
@@ -103,7 +103,7 @@ class BlockParser(Parser):
         try:
             json_data: dict[str, Any] = json.loads("\n".join(json_lines))
             deserialized_json = _BlockParserDeserializedJson(json_data)
-        except (JSONDecodeError, ValueError):
+        except ValueError:
             raise ModelError("Error: Model output malformed json.")
 
         if deserialized_json.action is None:

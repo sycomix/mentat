@@ -47,9 +47,8 @@ class DeletionAction:
                 f"File {self.old_file_name} already exists; unable to re-create",
                 color="light_red",
             )
-        else:
-            with open(self.old_file_name, "w") as f:
-                f.write("\n".join(self.old_file_lines))
+        with open(self.old_file_name, "w") as f:
+            f.write("\n".join(self.old_file_lines))
 
 
 @attr.define()
@@ -63,9 +62,8 @@ class EditAction:
                 f"File {self.cur_file_name} does not exist; unable to undo edit",
                 color="light_red",
             )
-        else:
-            with open(self.cur_file_name, "w") as f:
-                f.write("\n".join(self.old_file_lines))
+        with open(self.cur_file_name, "w") as f:
+            f.write("\n".join(self.old_file_lines))
 
 
 HistoryAction = RenameAction | CreationAction | DeletionAction | EditAction
@@ -106,7 +104,6 @@ class EditHistory:
 
         errors = list[str]()
         while self.edits:
-            error = self.undo()
-            if error:
+            if error := self.undo():
                 errors.append(error)
         return "\n".join(errors)

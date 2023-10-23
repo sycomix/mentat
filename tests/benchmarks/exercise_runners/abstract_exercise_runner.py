@@ -40,7 +40,7 @@ class AbstractExerciseRunner:
         if not Path("results.txt").exists():
             return None
         with open("results.txt", "r") as f:
-            for line in f.readlines():
+            for line in f:
                 if f'"{self.name}"' in line:
                     return json.loads(line)
 

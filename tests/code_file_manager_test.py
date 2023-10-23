@@ -26,7 +26,7 @@ async def test_posix_paths(
     code_message = await mock_code_context.get_code_message(
         "", mock_config.model(), 1e6
     )
-    assert dir_name + "/" + file_name in code_message.split("\n")
+    assert f"{dir_name}/{file_name}" in code_message.split("\n")
 
 
 @pytest.mark.asyncio
@@ -45,7 +45,7 @@ async def test_partial_files(
              fourth
              fifth"""))
 
-    file_path_partial = file_path + ":1,3-5"
+    file_path_partial = f"{file_path}:1,3-5"
     mock_code_context.include_files, _ = get_include_files([file_path_partial], [])
     mock_code_context.settings.auto_tokens = 0
     mock_code_context.code_map = False

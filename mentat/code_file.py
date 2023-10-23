@@ -97,14 +97,12 @@ class CodeFile:
         )
 
     def contains_line(self, line_number: int):
-        return any([interval.contains(line_number) for interval in self.intervals])
+        return any(interval.contains(line_number) for interval in self.intervals)
 
     async def _get_code_message(self) -> list[str]:
         git_root = GIT_ROOT.get()
         code_file_manager = CODE_FILE_MANAGER.get()
         parser = PARSER.get()
-
-        code_message: list[str] = []
 
         # We always want to give GPT posix paths
         abs_path = Path(git_root / self.path)
@@ -114,8 +112,7 @@ class CodeFile:
             filename = f"USER INCLUDED: {posix_rel_path}"
         else:
             filename = f"{posix_rel_path}"
-        code_message.append(filename)
-
+        code_message: list[str] = [filename]
         if self.level in {CodeMessageLevel.CODE, CodeMessageLevel.INTERVAL}:
             file_lines = code_file_manager.read_file(abs_path)
             for i, line in enumerate(file_lines, start=1):

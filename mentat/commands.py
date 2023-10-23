@@ -31,7 +31,7 @@ class Command(ABC):
 
     @classmethod
     def get_command_completions(cls) -> List[str]:
-        return list(map(lambda name: "/" + name, cls._registered_commands))
+        return list(map(lambda name: f"/{name}", cls._registered_commands))
 
     @abstractmethod
     async def apply(self, *args: str) -> None:
@@ -76,10 +76,7 @@ class HelpCommand(Command, command_name="help"):
     async def apply(self, *args: str) -> None:
         stream = SESSION_STREAM.get()
 
-        if not args:
-            commands = Command._registered_commands.keys()
-        else:
-            commands = args
+        commands = Command._registered_commands.keys() if not args else args
         for command_name in commands:
             if command_name not in Command._registered_commands:
                 await stream.send(
@@ -129,7 +126,7 @@ class IncludeCommand(Command, command_name="include"):
         stream = SESSION_STREAM.get()
         code_context = CODE_CONTEXT.get()
 
-        if len(args) == 0:
+        if not args:
             await stream.send("No files specified\n", color="yellow")
             return
         for file_path in args:
@@ -156,7 +153,7 @@ class ExcludeCommand(Command, command_name="exclude"):
         stream = SESSION_STREAM.get()
         code_context = CODE_CONTEXT.get()
 
-        if len(args) == 0:
+        if not args:
             await stream.send("No files specified\n", color="yellow")
             return
         for file_path in args:
@@ -176,8 +173,7 @@ class UndoCommand(Command, command_name="undo"):
     async def apply(self, *args: str) -> None:
         stream = SESSION_STREAM.get()
         code_file_manager = CODE_FILE_MANAGER.get()
-        errors = code_file_manager.history.undo()
-        if errors:
+        if errors := code_file_manager.history.undo():
             await stream.send(errors)
         await stream.send("Undo complete", color="green")
 
@@ -194,8 +190,7 @@ class UndoAllCommand(Command, command_name="undo-all"):
     async def apply(self, *args: str) -> None:
         stream = SESSION_STREAM.get()
         code_file_manager = CODE_FILE_MANAGER.get()
-        errors = code_file_manager.history.undo_all()
-        if errors:
+        if errors := code_file_manager.history.undo_all():
             await stream.send(errors)
         await stream.send("Undos complete", color="green")
 

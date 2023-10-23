@@ -100,10 +100,10 @@ async def test_code_context_performance(
         y_pred = [f in actual for f in get_non_gitignored_files(code_dir)]
         y_true = [f in expected_features for f in get_non_gitignored_files(code_dir)]
 
-        _TP = sum([1 for p, t in zip(y_pred, y_true) if p and t])
-        _TN = sum([1 for p, t in zip(y_pred, y_true) if not p and not t])
-        _FP = sum([1 for p, t in zip(y_pred, y_true) if p and not t])
-        _FN = sum([1 for p, t in zip(y_pred, y_true) if not p and t])
+        _TP = sum(1 for p, t in zip(y_pred, y_true) if p and t)
+        _TN = sum(1 for p, t in zip(y_pred, y_true) if not p and not t)
+        _FP = sum(1 for p, t in zip(y_pred, y_true) if p and not t)
+        _FN = sum(1 for p, t in zip(y_pred, y_true) if not p and t)
         print(f"True Positive:\t{_TP:.3f}")
         print(f"True Negative:\t{_TN:.3f}")
         print(f"False Positive:\t{_FP:.3f}")

@@ -38,9 +38,7 @@ def main(run=False, threshold=0.75, count=1):
             print()
             nodes = []
             with open(benchmark_log_location, "r") as result_file:
-                for line in result_file:
-                    nodes.append(json.loads(line))
-
+                nodes.extend(json.loads(line) for line in result_file)
             # pytest_reportlog makes multiple nodes per test
             test_names = defaultdict(lambda: True)
             for node in nodes:

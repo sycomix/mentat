@@ -19,6 +19,4 @@ async def run_subprocess_async(*args: str) -> str:
         error_output = stderr.decode("utf-8").strip() if stderr else ""
         raise Exception(f"Subprocess failed with error: {error_output}")
 
-    output = stdout.decode("utf-8").strip() if stdout else ""
-
-    return output
+    return stdout.decode("utf-8").strip() if stdout else ""

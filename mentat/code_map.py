@@ -48,7 +48,7 @@ async def get_code_map(
 
         last = name
         if signature:
-            last += " " + signature
+            last += f" {signature}"
 
         res: list[Any] = []
         if scope:

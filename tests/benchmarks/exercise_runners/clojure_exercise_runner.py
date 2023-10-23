@@ -11,7 +11,7 @@ class ClojureExerciseRunner(AbstractExerciseRunner):
 
     def run_test(self):
         self._run_test_command(
-            ["lein", "test", ":only", self.name + "-test"], cwd=self.dir
+            ["lein", "test", ":only", f"{self.name}-test"], cwd=self.dir
         )
 
     def passed(self):

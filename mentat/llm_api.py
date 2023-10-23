@@ -29,8 +29,7 @@ def setup_api_key():
     if not load_dotenv(mentat_dir_path / ".env"):
         load_dotenv()
     key = os.getenv("OPENAI_API_KEY")
-    base_url = os.getenv("OPENAI_API_BASE")
-    if base_url:
+    if base_url := os.getenv("OPENAI_API_BASE"):
         openai.api_base = base_url
     if not key:
         raise UserError(
@@ -128,30 +127,18 @@ def is_model_available(model: str) -> bool:
 
 def model_context_size(model: str) -> Optional[int]:
     if "gpt-4" in model:
-        if "32k" in model:
-            return 32768
-        else:
-            return 8192
+        return 32768 if "32k" in model else 8192
     elif "gpt-3.5" in model:
-        if "16k" in model:
-            return 16385
-        else:
-            return 4097
+        return 16385 if "16k" in model else 4097
     else:
         return None
 
 
 def model_price_per_1000_tokens(model: str) -> Optional[tuple[float, float]]:
     if "gpt-4" in model:
-        if "32k" in model:
-            return (0.06, 0.12)
-        else:
-            return (0.03, 0.06)
+        return (0.06, 0.12) if "32k" in model else (0.03, 0.06)
     elif "gpt-3.5" in model:
-        if "16k" in model:
-            return (0.003, 0.004)
-        else:
-            return (0.0015, 0.002)
+        return (0.003, 0.004) if "16k" in model else (0.0015, 0.002)
     else:
         return None
 
@@ -159,14 +146,13 @@ def model_price_per_1000_tokens(model: str) -> Optional[tuple[float, float]]:
 async def get_prompt_token_count(messages: list[dict[str, str]], model: str) -> int:
     stream = SESSION_STREAM.get()
 
-    prompt_token_count = 0
-    for message in messages:
-        prompt_token_count += count_tokens(message["content"], model)
+    prompt_token_count = sum(
+        count_tokens(message["content"], model) for message in messages
+    )
     await stream.send(f"Total token count: {prompt_token_count}", color="cyan")
 
     token_buffer = 500
-    context_size = model_context_size(model)
-    if context_size:
+    if context_size := model_context_size(model):
         if prompt_token_count > context_size - token_buffer:
             await stream.send(
                 f"Warning: {model} has a maximum context length of {context_size}"
@@ -195,8 +181,7 @@ class CostTracker:
 
         self.total_tokens += num_prompt_tokens + num_sampled_tokens
         tokens_per_second = num_sampled_tokens / call_time
-        cost = model_price_per_1000_tokens(model)
-        if cost:
+        if cost := model_price_per_1000_tokens(model):
             prompt_cost = (num_prompt_tokens / 1000) * cost[0]
             sampled_cost = (num_sampled_tokens / 1000) * cost[1]
             call_cost = prompt_cost + sampled_cost

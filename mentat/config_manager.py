@@ -72,9 +72,7 @@ class ConfigManager:
         else:
             project_config = dict[str, str]()
 
-        self = cls(user_config, project_config)
-
-        return self
+        return cls(user_config, project_config)
 
     def input_style(self) -> list[tuple[str, str]]:
         return cast(list[tuple[str, str]], self._get_key("input-style"))
@@ -83,8 +81,7 @@ class ConfigManager:
         return cast(str, self._get_key("model"))
 
     def maximum_context(self) -> Optional[int]:
-        maximum_context = self._get_key("maximum-context")
-        if maximum_context:
+        if maximum_context := self._get_key("maximum-context"):
             return int(maximum_context)
         return None
 

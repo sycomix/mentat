@@ -64,8 +64,7 @@ class Conversation:
                 )
         prompt = parser.get_system_prompt()
         context_size = model_context_size(self.model)
-        maximum_context = config.maximum_context()
-        if maximum_context:
+        if maximum_context := config.maximum_context():
             if context_size:
                 context_size = min(context_size, maximum_context)
             else:

@@ -207,9 +207,10 @@ def _get_treeish_type(git_root: Path, treeish: str) -> TreeishType:
         if "~" in treeish or "^" in treeish:
             return "relative"
 
-        if _git_command(git_root, "show-ref", "--heads", treeish):
-            return "branch"
         else:
-            return "commit"
-
+            return (
+                "branch"
+                if _git_command(git_root, "show-ref", "--heads", treeish)
+                else "commit"
+            )
     raise UserError(f"Unsupported treeish type: {object_type}")
